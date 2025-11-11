@@ -4,6 +4,7 @@ import { User, UserRole } from "../../../domain/entities/User";
 import { Email } from "../../../domain/value-objects/Email";
 import { Password } from "../../../domain/value-objects/Password";
 import { RegisterUserDTO, UserResponseDTO } from "../../dtos/UserDTO";
+import { ValidationError } from "../../../../shared/errors/ValidationError";
 
 @injectable()
 export class RegisterUserUseCase {

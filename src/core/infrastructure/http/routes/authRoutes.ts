@@ -15,3 +15,6 @@ router.post(
 router.post("/login", validateRequest(loginSchema), authController.login);
 router.post("/logout", authMiddleware, authController.logout);
 router.get("/me", authMiddleware, authController.getProfile);
+router.put("/profile", authMiddleware, authController.updateProfile);
+
+export default router;

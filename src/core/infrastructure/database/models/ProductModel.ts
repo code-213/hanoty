@@ -1,3 +1,15 @@
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  PrimaryKey,
+  Default,
+  ForeignKey,
+  BelongsTo,
+} from "sequelize-typescript";
+import { UserModel } from "./UserModel";
+
 @Table({ tableName: "products", timestamps: true })
 export class ProductModel extends Model {
   @PrimaryKey
@@ -23,6 +35,7 @@ export class ProductModel extends Model {
   @Column(DataType.STRING)
   sku!: string;
 
+  @ForeignKey(() => UserModel)
   @Column(DataType.UUID)
   sellerId!: string;
 
@@ -32,4 +45,7 @@ export class ProductModel extends Model {
   @Default("active")
   @Column(DataType.ENUM("active", "inactive", "deleted"))
   status!: string;
+
+  @BelongsTo(() => UserModel)
+  seller!: UserModel;
 }

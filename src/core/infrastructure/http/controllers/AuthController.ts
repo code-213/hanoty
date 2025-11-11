@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import { container } from "../../../../config/container";
 import { RegisterUserUseCase } from "../../../application/use-cases/auth/RegisterUser";
 import { LoginUserUseCase } from "../../../application/use-cases/auth/LoginUser";
+import { IUserRepository } from "../../../domain/repositories/IUserRepository";
+import { AuthRequest } from "../middlewares/authMiddleware";
+import { NotFoundError } from "../../../../shared/errors/AppError";
 
 export class AuthController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -41,7 +44,6 @@ export class AuthController {
 
   async logout(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      // In a real app, you'd invalidate the token in Redis or database
       res.status(200).json({
         success: true,
         message: "Logged out successfully",
@@ -63,6 +65,28 @@ export class AuthController {
       res.status(200).json({
         success: true,
         data: user.toJSON(),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateProfile(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userRepository = container.get<IUserRepository>("IUserRepository");
+      const user = await userRepository.findById(req.user!.userId);
+
+      if (!user) {
+        throw new NotFoundError("User");
+      }
+
+      user.updateProfile(req.body.name, req.body.phone, req.body.avatar);
+      const updatedUser = await userRepository.update(user);
+
+      res.status(200).json({
+        success: true,
+        data: updatedUser.toJSON(),
+        message: "Profile updated successfully",
       });
     } catch (error) {
       next(error);

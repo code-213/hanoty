@@ -1,3 +1,9 @@
+import { injectable, inject } from "inversify";
+import { IProductRepository } from "../../../domain/repositories/IProductRepository";
+import { Product, ProductStatus } from "../../../domain/entities/Product";
+import { Money } from "../../../domain/value-objects/Money";
+import { CreateProductDTO } from "../../dtos/ProductDTO";
+
 @injectable()
 export class CreateProductUseCase {
   constructor(

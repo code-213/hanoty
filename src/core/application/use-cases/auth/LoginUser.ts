@@ -1,5 +1,10 @@
+import { injectable, inject } from "inversify";
 import jwt from "jsonwebtoken";
 import { jwtConfig } from "../../../../config/jwt";
+import { IUserRepository } from "../../../domain/repositories/IUserRepository";
+import { Email } from "../../../domain/value-objects/Email";
+import { LoginUserDTO, UserResponseDTO } from "../../dtos/UserDTO";
+import { UnauthorizedError } from "../../../../shared/errors/AppError";
 
 @injectable()
 export class LoginUserUseCase {
@@ -44,6 +49,8 @@ export class LoginUserUseCase {
         name: user.name,
         role: user.role,
         isVerified: user.isVerified,
+        phone: user.phone,
+        avatar: user["props"].avatar,
         createdAt: new Date(),
       },
       accessToken,

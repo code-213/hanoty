@@ -1,3 +1,9 @@
+import { injectable } from "inversify";
+import { IProductRepository } from "../../../domain/repositories/IProductRepository";
+import { Product, ProductStatus } from "../../../domain/entities/Product";
+import { Money } from "../../../domain/value-objects/Money";
+import { ProductModel } from "../models/ProductModel";
+
 @injectable()
 export class ProductRepository implements IProductRepository {
   async findById(id: string): Promise<Product | null> {
@@ -12,36 +18,40 @@ export class ProductRepository implements IProductRepository {
   ): Promise<{ products: Product[]; total: number }> {
     const offset = (page - 1) * limit;
     const { rows, count } = await ProductModel.findAndCountAll({
-      where: { sellerId },
+      where: { sellerId, status: ["active", "inactive"] },
       limit,
       offset,
+      order: [["createdAt", "DESC"]],
     });
     const products = rows.map((row) => this.toDomain(row));
     return { products, total: count };
   }
 
   async save(product: Product): Promise<Product> {
+    const productJSON = product.toJSON();
     const productModel = await ProductModel.create({
-      name: product.name,
-      description: product["props"].description,
-      price: product.price.getAmount(),
-      stock: product.stock,
-      category: product["props"].category,
-      sku: product["props"].sku,
-      sellerId: product["props"].sellerId,
-      images: product["props"].images,
-      status: product.status,
+      name: productJSON.name,
+      description: productJSON.description,
+      price: productJSON.price,
+      stock: productJSON.stock,
+      category: productJSON.category,
+      sku: productJSON.sku,
+      sellerId: productJSON.sellerId,
+      images: productJSON.images,
+      status: productJSON.status,
     });
     return this.toDomain(productModel);
   }
 
   async update(product: Product): Promise<Product> {
+    const productJSON = product.toJSON();
     await ProductModel.update(
       {
-        name: product.name,
-        price: product.price.getAmount(),
-        stock: product.stock,
-        status: product.status,
+        name: productJSON.name,
+        description: productJSON.description,
+        price: productJSON.price,
+        stock: productJSON.stock,
+        status: productJSON.status,
       },
       { where: { id: product.id } }
     );
@@ -58,8 +68,10 @@ export class ProductRepository implements IProductRepository {
   ): Promise<{ products: Product[]; total: number }> {
     const offset = (page - 1) * limit;
     const { rows, count } = await ProductModel.findAndCountAll({
+      where: { status: ["active", "inactive"] },
       limit,
       offset,
+      order: [["createdAt", "DESC"]],
     });
     const products = rows.map((row) => this.toDomain(row));
     return { products, total: count };
@@ -76,7 +88,7 @@ export class ProductRepository implements IProductRepository {
       sku: model.sku,
       sellerId: model.sellerId,
       images: model.images,
-      status: model.status as any,
+      status: model.status as ProductStatus,
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
     });

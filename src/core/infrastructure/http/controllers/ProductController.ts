@@ -1,3 +1,14 @@
+import { Response, NextFunction } from "express";
+import { AuthRequest } from "../middlewares/authMiddleware";
+import { container } from "../../../../config/container";
+import { IProductRepository } from "../../../domain/repositories/IProductRepository";
+import { CreateProductUseCase } from "../../../application/use-cases/products/CreateProduct";
+import { UpdateProductUseCase } from "../../../application/use-cases/products/UpdateProduct";
+import {
+  NotFoundError,
+  UnauthorizedError,
+} from "../../../../shared/errors/AppError";
+
 export class ProductController {
   async getProducts(req: AuthRequest, res: Response, next: NextFunction) {
     try {
