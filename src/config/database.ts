@@ -3,11 +3,10 @@ import path from "path";
 import dotenv from "dotenv";
 
 dotenv.config();
-
 export const sequelize = new Sequelize({
-  database: process.env.DB_NAME || "ecommerce_db",
+  database: process.env.DB_NAME || "hanouty",
   username: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "password",
+  password: process.env.DB_PASSWORD || "root",
   host: process.env.DB_HOST || "localhost",
   port: parseInt(process.env.DB_PORT || "3306"),
   dialect: "mysql",
@@ -20,7 +19,6 @@ export const sequelize = new Sequelize({
     idle: 10000,
   },
 });
-
 export const initializeDatabase = async (): Promise<void> => {
   try {
     await sequelize.authenticate();
