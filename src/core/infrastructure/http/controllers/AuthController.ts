@@ -4,7 +4,7 @@ import { RegisterUserUseCase } from "../../../application/use-cases/auth/Registe
 import { LoginUserUseCase } from "../../../application/use-cases/auth/LoginUser";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { AuthRequest } from "../middlewares/authMiddleware";
-import { NotFoundError } from "../../../../shared/errors/AppError";
+import { NotFoundError } from "../../../../shared/errors/NotFoundError";
 
 export class AuthController {
   async register(req: Request, res: Response, next: NextFunction) {

@@ -4,10 +4,8 @@ import { container } from "../../../../config/container";
 import { CreateOrderUseCase } from "../../../application/use-cases/orders/CreateOrder";
 import { UpdateOrderStatusUseCase } from "../../../application/use-cases/orders/UpdateOrderStatus";
 import { IOrderRepository } from "../../../domain/repositories/IOrderRepository";
-import {
-  NotFoundError,
-  UnauthorizedError,
-} from "../../../../shared/errors/AppError";
+import { NotFoundError } from "../../../../shared/errors/NotFoundError";
+import { UnauthorizedError } from "../../../../shared/errors/UnauthorizedError";
 
 export class OrderController {
   async getOrders(req: AuthRequest, res: Response, next: NextFunction) {

@@ -1,3 +1,4 @@
+import { ValidationError } from "../../../shared/errors/ValidationError";
 import { Money } from "../value-objects/Money";
 
 export enum ProductStatus {
