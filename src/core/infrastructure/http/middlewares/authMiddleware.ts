@@ -18,12 +18,32 @@ export const authMiddleware = (
   try {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw new UnauthorizedError("No token provided");
+    // Debug logging
+    console.log("Auth Header:", authHeader);
+
+    if (!authHeader) {
+      throw new UnauthorizedError("No authorization header provided");
     }
 
-    const token = authHeader.substring(7);
+    if (!authHeader.startsWith("Bearer ")) {
+      throw new UnauthorizedError(
+        "Invalid authorization format. Use: Bearer <token>"
+      );
+    }
+
+    const token = authHeader.substring(7); // Remove "Bearer " prefix
+
+    // Debug logging
+    console.log("Token (first 20 chars):", token.substring(0, 20));
+    console.log(
+      "JWT Secret:",
+      jwtConfig.accessTokenSecret.substring(0, 10) + "..."
+    );
+
+    // Verify token
     const decoded = jwt.verify(token, jwtConfig.accessTokenSecret) as any;
+
+    console.log("Decoded token:", decoded);
 
     req.user = {
       userId: decoded.userId,
@@ -31,8 +51,23 @@ export const authMiddleware = (
     };
 
     next();
-  } catch (error) {
-    next(new UnauthorizedError("Invalid token"));
+  } catch (error: any) {
+    // Better error handling
+    console.error("Auth middleware error:", error.message);
+
+    if (error.name === "JsonWebTokenError") {
+      return next(new UnauthorizedError("Invalid token format"));
+    }
+
+    if (error.name === "TokenExpiredError") {
+      return next(new UnauthorizedError("Token has expired"));
+    }
+
+    if (error instanceof UnauthorizedError) {
+      return next(error);
+    }
+
+    next(new UnauthorizedError("Authentication failed"));
   }
 };
 
