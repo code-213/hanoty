@@ -13,6 +13,10 @@ export interface IOrderRepository {
     page: number,
     limit: number
   ): Promise<{ orders: Order[]; total: number }>;
+  findAll(
+    page: number,
+    limit: number
+  ): Promise<{ orders: Order[]; total: number }>;
   save(order: Order): Promise<Order>;
   update(order: Order): Promise<Order>;
   delete(id: string): Promise<void>;

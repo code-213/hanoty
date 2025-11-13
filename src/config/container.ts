@@ -3,9 +3,11 @@ import { Container } from "inversify";
 import { IUserRepository } from "../core/domain/repositories/IUserRepository";
 import { IProductRepository } from "../core/domain/repositories/IProductRepository";
 import { IOrderRepository } from "../core/domain/repositories/IOrderRepository";
+import { ICardRepository } from "../core/domain/repositories/ICardRepository";
 import { UserRepository } from "../core/infrastructure/database/repositories/UserRepository";
 import { ProductRepository } from "../core/infrastructure/database/repositories/ProductRepository";
 import { OrderRepository } from "../core/infrastructure/database/repositories/OrderRepository";
+import { CardRepository } from "../core/infrastructure/database/repositories/CardRepository";
 import { RegisterUserUseCase } from "../core/application/use-cases/auth/RegisterUser";
 import { LoginUserUseCase } from "../core/application/use-cases/auth/LoginUser";
 import { RefreshTokenUseCase } from "../core/application/use-cases/auth/RefreshToken";
@@ -28,6 +30,10 @@ container
 container
   .bind<IOrderRepository>("IOrderRepository")
   .to(OrderRepository)
+  .inSingletonScope();
+container
+  .bind<ICardRepository>("ICardRepository")
+  .to(CardRepository)
   .inSingletonScope();
 
 // Auth Use Cases

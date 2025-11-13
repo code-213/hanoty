@@ -1,4 +1,5 @@
 import { injectable } from "inversify";
+import { Op } from "sequelize";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { User, UserRole } from "../../../domain/entities/User";
 import { Email } from "../../../domain/value-objects/Email";
@@ -52,7 +53,32 @@ export class UserRepository implements IUserRepository {
     limit: number
   ): Promise<{ users: User[]; total: number }> {
     const offset = (page - 1) * limit;
-    const { rows, count } = await UserModel.findAndCountAll({ limit, offset });
+    const { rows, count } = await UserModel.findAndCountAll({
+      limit,
+      offset,
+      order: [["createdAt", "DESC"]],
+    });
+    const users = rows.map((row) => this.toDomain(row));
+    return { users, total: count };
+  }
+
+  async searchUsers(
+    searchTerm: string,
+    page: number,
+    limit: number
+  ): Promise<{ users: User[]; total: number }> {
+    const offset = (page - 1) * limit;
+    const { rows, count } = await UserModel.findAndCountAll({
+      where: {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${searchTerm}%` } },
+          { email: { [Op.iLike]: `%${searchTerm}%` } },
+        ],
+      },
+      limit,
+      offset,
+      order: [["createdAt", "DESC"]],
+    });
     const users = rows.map((row) => this.toDomain(row));
     return { users, total: count };
   }
@@ -65,6 +91,7 @@ export class UserRepository implements IUserRepository {
       name: model.name,
       role: model.role as UserRole,
       phone: model.phone,
+      avatar: model.avatar,
       isVerified: model.isVerified,
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,

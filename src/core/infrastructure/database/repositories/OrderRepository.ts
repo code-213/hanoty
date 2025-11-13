@@ -54,6 +54,21 @@ export class OrderRepository implements IOrderRepository {
     return { orders, total: count };
   }
 
+  async findAll(
+    page: number,
+    limit: number
+  ): Promise<{ orders: Order[]; total: number }> {
+    const offset = (page - 1) * limit;
+    const { rows, count } = await OrderModel.findAndCountAll({
+      limit,
+      offset,
+      order: [["createdAt", "DESC"]],
+    });
+
+    const orders = rows.map((row) => this.toDomain(row));
+    return { orders, total: count };
+  }
+
   async save(order: Order): Promise<Order> {
     const orderJSON = order.toJSON();
     const orderModel = await OrderModel.create({

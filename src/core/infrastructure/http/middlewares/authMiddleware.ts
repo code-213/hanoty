@@ -19,7 +19,6 @@ export const authMiddleware = (
     const authHeader = req.headers.authorization;
 
     // Debug logging
-    console.log("Auth Header:", authHeader);
 
     if (!authHeader) {
       throw new UnauthorizedError("No authorization header provided");
@@ -33,17 +32,8 @@ export const authMiddleware = (
 
     const token = authHeader.substring(7); // Remove "Bearer " prefix
 
-    // Debug logging
-    console.log("Token (first 20 chars):", token.substring(0, 20));
-    console.log(
-      "JWT Secret:",
-      jwtConfig.accessTokenSecret.substring(0, 10) + "..."
-    );
-
     // Verify token
     const decoded = jwt.verify(token, jwtConfig.accessTokenSecret) as any;
-
-    console.log("Decoded token:", decoded);
 
     req.user = {
       userId: decoded.userId,
