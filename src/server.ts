@@ -2,8 +2,7 @@ import "reflect-metadata";
 import dotenv from "dotenv";
 import { createApp } from "./config/app";
 import { initializeDatabase } from "./config/database";
-import { container } from "./config/container";
-
+import { sequelize } from "./config/database";
 // Load environment variables
 dotenv.config();
 
