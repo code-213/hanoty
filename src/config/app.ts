@@ -10,12 +10,37 @@ import { rateLimitMiddleware } from "../core/infrastructure/http/middlewares/rat
 export const createApp = (): Application => {
   const app = express();
 
+  // Parse allowed origins from environment variable
+  const allowedOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(",").map((origin) => origin.trim())
+    : ["http://localhost:8080"];
+
+  console.log("🌐 Configured CORS allowed origins:", allowedOrigins);
+
   // Security middlewares
   app.use(helmet());
+
+  // Fixed CORS configuration - returns single origin per request
   app.use(
     cors({
-      origin: process.env.CORS_ORIGIN || "*",
+      origin: (origin, callback) => {
+        // Allow requests with no origin (mobile apps, curl, etc.)
+        if (!origin) {
+          return callback(null, true);
+        }
+
+        // Check if origin is in allowed list
+        if (allowedOrigins.includes(origin)) {
+          console.log(`✅ CORS allowed for origin: ${origin}`);
+          callback(null, origin); // Return the matching origin
+        } else {
+          console.warn(`❌ CORS blocked origin: ${origin}`);
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
       credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
     })
   );
 
